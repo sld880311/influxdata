@@ -718,6 +718,7 @@ func (h *Handler) async(q *influxql.Query, results <-chan *query.Result) {
 }
 
 // serveWrite receives incoming series data in line protocol format and writes it to the database.
+// 数据写入入口
 func (h *Handler) serveWrite(w http.ResponseWriter, r *http.Request, user meta.User) {
 	atomic.AddInt64(&h.stats.WriteRequests, 1)
 	atomic.AddInt64(&h.stats.ActiveWriteRequests, 1)
@@ -798,6 +799,7 @@ func (h *Handler) serveWrite(w http.ResponseWriter, r *http.Request, user meta.U
 		h.Logger.Info("Write body received by handler", zap.ByteString("body", buf.Bytes()))
 	}
 
+	// 解析待写入的数据
 	points, parseError := models.ParsePointsWithPrecision(buf.Bytes(), time.Now().UTC(), r.URL.Query().Get("precision"))
 	// Not points parsed correctly so return the error now
 	if parseError != nil && len(points) == 0 {
